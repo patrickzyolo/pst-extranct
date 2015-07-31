@@ -1,0 +1,3 @@
+#Tue May 10 15:20:03 CEST 2011
+task-tag-projects-already-scanned=Export,GetFileInfo,ListAllFolders,ListMailboxRootFolder,DisplayMessageBody,ExportToMimeMessage,GetAppointments,GetContacts,GetInboxMessages,GetMessageRecipients,GetTasks,SaveAttachments
+eclipse.preferences.version=1
