@@ -48,7 +48,9 @@ public class PstMailJSON
 		if (date != null)
 		{
 			// Mon May 25 10:00:00 CEST 2015
-			SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+			// SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd'T'HHmmssZ");
+
 			String s = formatter.format(date);
 
 			return s;
@@ -209,7 +211,7 @@ public class PstMailJSON
 		}
 	}
 
-    public static Map<String, String> get_mail(Item inItem)
+	public static Map<String, String> get_mail(Item inItem)
     {
 		Map<String, String> return_mail = new HashMap<String, String>();
 
