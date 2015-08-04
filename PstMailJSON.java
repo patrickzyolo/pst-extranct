@@ -49,8 +49,7 @@ public class PstMailJSON
 		{
 			// Mon May 25 10:00:00 CEST 2015
 			// SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd'T'HHmmssZ");
-
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			String s = formatter.format(date);
 
 			return s;

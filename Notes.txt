@@ -1,0 +1,3 @@
+/Volumes/LACIE SHARE/pst-extract/data/*.json
+/Users/hacker/Desktop/pst-extract/data/*.json
+
