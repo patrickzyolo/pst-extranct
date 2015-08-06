@@ -1,0 +1,41 @@
+{
+    "Recipier":[
+        {
+            "Name":"Person1",
+            "Recipient type":"TO",
+            "Email address": "person2@beispiel.com"
+        },
+        {
+            "Name":"Person2",
+            "Recipient type":"CC",
+            "Email address":"person2@beispiel.com"
+        },
+    ],
+    "DisplayCc":["Person1","Person2"],
+    "DisplayTo":["Person1","Person2"],
+    "Plain body":"Hallo",
+    "Html body":"<html ><\/html>",
+    "Rtf body":null,
+    "Subject":"R: HW- LIBANO",
+    "SenderEmailAddress":"sender@beispiel.com",
+    "Attachments":[
+        {
+            "id":2168964,
+            "path": "./data/1.pdf"
+        },
+        {
+            "id":2168964,
+            "path": "./data/2.pdf"
+        }],
+    "SenderName":"Sender",
+    "id":2168964,
+    "Appointment StartTime":"yyyy-MM-dd'T'HH:mm:ss",
+    "Appointment EndTime":"yyyy-MM-dd'T'HH:mm:ss",
+    "Task StartTime":"yyyy-MM-dd'T'HH:mm:ss",
+    "Task EndTime":"yyyy-MM-dd'T'HH:mm:ss",
+    "GivenName":"Name",
+    "Email1DisplayName":"Name2",
+    "Email1Address":"name@beispiel.com",
+    "BusinessAddress":"[...]",
+    "BusinessPhone":"040 987654321"
+}

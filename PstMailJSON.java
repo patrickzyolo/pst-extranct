@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -26,7 +27,7 @@ import com.independentsoft.pst.Task;
 
 public class PstMailJSON
 {
-	public static String name_clean(String fileName)
+	public static String clean_name(String fileName)
 	{
 		if (fileName != null)
 		{
@@ -47,7 +48,6 @@ public class PstMailJSON
 	{
 		if (date != null)
 		{
-			// Mon May 25 10:00:00 CEST 2015
 			// SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			String s = formatter.format(date);
@@ -155,6 +155,7 @@ public class PstMailJSON
 
 	public static JSONArray get_attachments(Item inItem, long id)
 	{
+		String dir = "Attachments/";
 		JSONArray return_attachments = new JSONArray();
 
 		if (inItem.getAttachments().size() > 0)
@@ -166,9 +167,27 @@ public class PstMailJSON
 		    	Attachment attachment = inItem.getAttachments().get(r);
 
 		        String fileName = (attachment.getFileName() != null) ? attachment.getFileName() : attachment.getDisplayName();
-				String filePath = "./Attachments/" + id + "-" + name_clean(fileName);
+				fileName = clean_name(fileName);
+				String filePath = dir + id + "-" + fileName;
 
 				tmp[r] = new JSONObject();
+
+				File test_file = new File(filePath);
+
+				if (test_file.exists())
+				{
+					int tmp_counter = 1;
+					String tmp_filePath = dir + id + "-" + tmp_counter + "-" + fileName;
+
+					while (test_file.exists())
+					{
+						tmp_filePath = dir + id + "-" + tmp_counter + "-" + fileName;
+						test_file = new File(tmp_filePath);
+						tmp_counter = tmp_counter + 1;
+					}
+
+					filePath = tmp_filePath;
+				}
 
 				try
 				{
@@ -178,13 +197,25 @@ public class PstMailJSON
 				{
 					System.err.println("IOException: get_attachments(Item inItem, long id)");
 					// System.err.println(fileName);
-					System.err.println("---> " + filePath);
+					System.err.println("id: " + id + " ---> " + filePath);
 
 					// e.printStackTrace();
 				}
 
-				tmp[r].put("id", id);
-				tmp[r].put("path", filePath);
+				if (filePath.contains("."))
+				{
+					String type[] = filePath.split("\\.");
+					tmp[r].put("asset_type", type[type.length - 1]);
+				}
+				else
+				{
+					tmp[r].put("asset_type", "mail_attachment");
+					// tmp[r].put("type", "unknown");
+					// tmp[r].put("type", null);
+				}
+
+				// tmp[r].put("asset_type", "mail_attachment");
+				tmp[r].put("path", Paths.get(filePath).toAbsolutePath().toString());
 				return_attachments.add(tmp[r]);
 		    }
 			return return_attachments;
@@ -195,8 +226,7 @@ public class PstMailJSON
 		}
 	}
 
-	//rtf body
-	public static String get_mail_body(Item inItem)
+	public static String get_rtf_body(Item inItem)
 	{
 		if (inItem.getBodyRtf() != null)
 		{
@@ -220,17 +250,17 @@ public class PstMailJSON
 
 			return_mail.put("SenderName", message.getSenderName());
 			return_mail.put("SenderEmailAddress", message.getSenderEmailAddress());
+			return_mail.put("Date", convertDateToString(message.getClientSubmitTime()));
         }
 		else
 		{
 			return_mail.put("SenderName", null);
 			return_mail.put("SenderEmailAddress", null);
-
+			return_mail.put("Date", null);
 		}
 		return return_mail;
     }
 
-	//Get display --> {"name":name, "id": 1234567}
 	public static Map<String, JSONArray> get_display(Item inItem)
 	{
 		Map<String, JSONArray> return_display = new HashMap<String, JSONArray>();
@@ -305,6 +335,7 @@ public class PstMailJSON
 	public static void main(String[] args)
 	{
 		String file_name = args[0];
+		String file_folder = "./data/";
 
         try
         {
@@ -331,56 +362,62 @@ public class PstMailJSON
 			                {
 								long id = items.get(i).getId();
 
-								File test_file = new File("./data/" + id + ".json");
+								File test_file = new File(file_folder + id + ".json");
 
 								if (test_file.exists())
 								{
-									test_file = new File("./data/" + tmp_id + ".json");
+									test_file = new File(file_folder + tmp_id + ".json");
 
 									while (test_file.exists())
 									{
 										tmp_id = tmp_id + 1;
-										test_file = new File("./data/" + tmp_id + ".json");
+										test_file = new File(file_folder + tmp_id + ".json");
 									}
 									id = tmp_id;
 									// System.out.print("New id: --> " + id + "\r");
 								}
 
-								PrintWriter output_file = new PrintWriter("./data/" + id + ".json", "UTF-8");
+								PrintWriter output_file = new PrintWriter(file_folder + id + ".json", "UTF-8");
 
 								JSONObject jsonOBJ = new JSONObject();
 
 								jsonOBJ.put("id", id);
 								jsonOBJ.put("Subject", items.get(i).getSubject());
-								jsonOBJ.put("Plain body", items.get(i).getBody());
-								jsonOBJ.put("Html body", items.get(i).getBodyHtmlText());
+								jsonOBJ.put("Plain_body", items.get(i).getBody());
+								jsonOBJ.put("Html_body", items.get(i).getBodyHtmlText());
 
 								Map<String, Date> task = get_task(items.get(i));
 
-								jsonOBJ.put("Task StartTime", convertDateToString(task.get("Task StartTime")));
-								jsonOBJ.put("Task EndTime", convertDateToString(task.get("Task EndTime")));
-
-
-								Map<String, String> contact = get_contact(items.get(i));
-
-								jsonOBJ.put("GivenName", contact.get("GivenName"));
-								jsonOBJ.put("Email1Address", contact.get("Email1Address"));
-								jsonOBJ.put("Email1DisplayName", contact.get("Email1DisplayName"));
-								jsonOBJ.put("BusinessPhone", contact.get("BusinessPhone"));
-								jsonOBJ.put("BusinessAddress", contact.get("BusinessAddress"));
+								jsonOBJ.put("Task_StartTime", convertDateToString(task.get("Task StartTime")));
+								jsonOBJ.put("Task_EndTime", convertDateToString(task.get("Task EndTime")));
 
 								Map<String, Date> appointment = get_appointment(items.get(i));
 
-								jsonOBJ.put("Appointment StartTime", convertDateToString(appointment.get("Appointment StartTime")));
-								jsonOBJ.put("Appointment EndTime", convertDateToString(appointment.get("Appointment EndTime")));
+								jsonOBJ.put("Appointment_StartTime", convertDateToString(appointment.get("Appointment StartTime")));
+								jsonOBJ.put("Appointment_EndTime", convertDateToString(appointment.get("Appointment EndTime")));
+
+								Map<String, String> contact = get_contact(items.get(i));
+								JSONObject contact_JSON = new JSONObject();
+
+								contact_JSON.put("name", contact.get("GivenName"));
+								contact_JSON.put("email", contact.get("Email1Address"));
+								contact_JSON.put("email_name", contact.get("Email1DisplayName"));
+								contact_JSON.put("BusinessPhone", contact.get("BusinessPhone"));
+								contact_JSON.put("BusinessAddress", contact.get("BusinessAddress"));
+
+								jsonOBJ.put("Contact", contact.get("BusinessAddress"));
 
 								jsonOBJ.put("Attachments", get_attachments(items.get(i), id));
-								jsonOBJ.put("Rtf body", get_mail_body(items.get(i)));
+								jsonOBJ.put("Rtf_body", get_rtf_body(items.get(i)));
 
 								Map<String, String> mail = get_mail(items.get(i));
+								JSONObject mail_JSON = new JSONObject();
 
-								jsonOBJ.put("SenderName", mail.get("SenderName"));
-								jsonOBJ.put("SenderEmailAddress", mail.get("SenderEmailAddress"));
+								mail_JSON.put("name", mail.get("SenderName"));
+								mail_JSON.put("email", mail.get("SenderEmailAddress"));
+
+								jsonOBJ.put("Sender", mail_JSON);
+								jsonOBJ.put("Date", mail.get("Date"));
 
 								Map<String, JSONArray> display = get_display(items.get(i));
 
@@ -396,7 +433,7 @@ public class PstMailJSON
 			        }
 			        catch (IOException e)
 			        {
-			        	System.out.println("IOException: main");
+			        	System.err.println("IOException: main");
 			            e.printStackTrace();
 			        }
 				}
@@ -411,7 +448,7 @@ public class PstMailJSON
         }
         catch (IOException e)
         {
-        	System.out.println("IOException: main");
+        	System.err.println("IOException: main");
 			e.printStackTrace();
 		}
 	}
