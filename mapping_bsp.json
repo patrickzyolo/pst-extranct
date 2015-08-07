@@ -1,0 +1,64 @@
+{
+    "mail_message": {
+        "_id": {
+            "path": "id"
+        }, 
+        "properties": {
+            "date": {
+                "type": "date"
+            }, 
+            "classification": {
+                "index": "not_analyzed", 
+                "type": "string"
+            }, 
+            "destination": {
+                "index": "not_analyzed", 
+                "type": "string"
+            }, 
+            "header": {
+                "type": "string"
+            }, 
+            "message": {
+                "type": "string"
+            }, 
+            "origin": {
+                "index": "not_analyzed", 
+                "type": "string"
+            }, 
+            "record": {
+                "type": "string"
+            },
+            "mention_name": {
+                "index": "not_analyzed", 
+                "type": "string"
+            },
+            "attachment": {
+                "type": "nested",
+                "include_in_parent": "true", 
+                "properties": {
+                    "asset_type": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    }
+                } 
+            }, 
+            "Sender": {
+                "type": "nested",
+                "include_in_parent": "true", 
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "index":"not_analyzed"
+                    }
+                    "email": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    }
+                } 
+            } 
+        }
+    }
+}
