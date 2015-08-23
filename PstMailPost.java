@@ -21,6 +21,29 @@ import com.independentsoft.pst.Task;
 
 public class PstMailPost extends PstMailJSON
 {
+	private static void elasticsearch(String url, String data, String charset)
+	{
+		try
+		{
+			URLConnection connection = new URL(url).openConnection();
+			connection.setDoOutput(true);
+			connection.setRequestProperty("Accept-Charset", charset);
+			connection.setRequestProperty("Content-Type", "application/json;charset=" + charset);
+
+			try (OutputStream output = connection.getOutputStream())
+			{
+			  output.write(data.getBytes(charset));
+			}
+
+			InputStream response = connection.getInputStream();
+		}
+		catch (IOException e)
+		{
+			System.err.println("IOException: elasticsearch");
+			e.printStackTrace();
+		}
+	}
+
 	public static void main(String[] args)
 	{
 		// pst soucre Datei
@@ -29,11 +52,13 @@ public class PstMailPost extends PstMailJSON
 		// json ablage Ordner
 		String file_folder = "./data/";
 
+		String charset = "UTF-8";
+
+		String url = "http://debian.local:9200/hacking-team/mail";
+
         try
         {
             PstFile file = new PstFile(file_name);
-
-			URL url = new URL("http://debian.local:9200/hacking-team/mail");
 
             try
             {
@@ -151,43 +176,17 @@ public class PstMailPost extends PstMailJSON
 								output_file.println(root_json);
 								output_file.close();
 
-								// HttpURLConnection httpcon = (HttpURLConnection) (url.openConnection());
-								// httpcon.setDoOutput(true);
-								// httpcon.setRequestProperty("Content-Type", "application/json");
-								// httpcon.setRequestProperty("Accept", "application/json");
-								// httpcon.setRequestMethod("POST");
-								// httpcon.connect();
-								//
-								// byte[] outputBytes = root_json.toJSONString().getBytes();
-								// OutputStream os = httpcon.getOutputStream();
-								//
-								// os.write(outputBytes);
-								// os.flush();
-								// os.close();
-
-
-								String charset = "UTF-8";
-								URLConnection connection = url.openConnection();
-								connection.setDoOutput(true);
-								connection.setRequestProperty("Accept-Charset", charset);
-								connection.setRequestProperty("Content-Type", "application/json;charset=" + charset);
-
-								try (OutputStream output = connection.getOutputStream())
-								{
-								  output.write(root_json.toJSONString().getBytes(charset));
-								}
-
-								InputStream response   = connection.getInputStream();
+								elasticsearch(url, root_json.toJSONString(), charset);
 							}
 			        	}
 			        }
 			        catch (IOException e)
 			        {
 			        	System.err.println("IOException: main");
-			            // e.printStackTrace();
+			            e.printStackTrace();
 			        }
 				}
-           }
+           	}
             finally
             {
                 if (file != null)
@@ -201,15 +200,5 @@ public class PstMailPost extends PstMailJSON
         	System.err.println("IOException: main");
 			e.printStackTrace();
 		}
-
-		// try
-		// {
-		// 	os.close();
-		// }
-		// catch (IOException e)
-		// {
-		// 	System.err.println("IOException: elasticsearch");
-		// 	e.printStackTrace();
-		// }
 	}
 }
