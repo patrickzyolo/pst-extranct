@@ -33,9 +33,22 @@ public class PstMailPost extends PstMailJSON
 			try (OutputStream output = connection.getOutputStream())
 			{
 			  output.write(data.getBytes(charset));
+			  output.flush();
+			  output.close();
 			}
-
-			InputStream response = connection.getInputStream();
+			//
+			// InputStream response = connection.getInputStream();
+			//
+			// BufferedReader reader = new BufferedReader(new InputStreamReader(response));
+			// StringBuilder result = new StringBuilder();
+			// String line;
+			//
+			// while((line = reader.readLine()) != null)
+			// {
+			//     result.append(line);
+			// }
+			//
+			// System.out.println(result.toString());
 		}
 		catch (IOException e)
 		{
