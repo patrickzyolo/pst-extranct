@@ -27,7 +27,6 @@ import com.independentsoft.pst.Contact;
 import com.independentsoft.pst.Recipient;
 import com.independentsoft.pst.Task;
 
-
 public class PstMailJSON
 {
 	// Bereinigt den Namen des Attachments
