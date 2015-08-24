@@ -1,7 +1,9 @@
 /*
 	Java programm zum pst extrakt
 */
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.File;
 
 import java.util.*;
 
@@ -25,41 +27,8 @@ import com.independentsoft.pst.Contact;
 import com.independentsoft.pst.Recipient;
 import com.independentsoft.pst.Task;
 
-public class PstMailJSON
+public class PstMailJSON_auto
 {
-	public static long get_start_id(File file)
-	{
-	    String content = null;
-	    FileReader reader = null;
-	    try
-		{
-	    	reader = new FileReader(file);
-	        char[] chars = new char[(int) file.length()];
-	        reader.read(chars);
-	        content = new String(chars);
-	        reader.close();
-	    }
-		catch (IOException e)
-		{
-	        e.printStackTrace();
-	    }
-		finally
-		{
-	        if(reader != null)
-			{
-				try
-				{
-					reader.close();
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
-	    }
-	    return Long.parseLong(content.replace("\n", ""));
-	}
-
 	// Bereinigt den Namen des Attachments
 	public static String clean_name(String fileName)
 	{
@@ -497,16 +466,6 @@ public class PstMailJSON
 		// json ablage Ordner
 		String file_folder = "./data/";
 
-		long start_id = 1;
-
-		File id_file = new File("id.txt");
-
-		if (id_file.exists())
-		{
-			start_id = get_start_id(id_file);
-			System.out.println("Start id: " + start_id);
-		}
-
         try
         {
             PstFile file = new PstFile(file_name);
@@ -515,6 +474,9 @@ public class PstMailJSON
             {
 				// Alle Ordner in der pst Datei --> anzahl
                 List<Folder> folders = file.getMailboxRoot().getFolders(true);
+
+				// tmp_id zur performant Verbesserung bei der neuen id Vergabe
+				long tmp_id = 1;
 
 				// Alle Ordner durchsuchen
 				for (int x = 0; x < folders.size(); x++)
@@ -537,13 +499,36 @@ public class PstMailJSON
 			                for (int i = 0; i < items.size(); i++)
 			                {
 								// id der Mail (Item)
-								long id = start_id;
+								long id = items.get(i).getId();
 
 								/*
 									Checkt ob die json datei schon im
 									file_folder exsistiert und generiet
 									ggf. eine neue.
 								*/
+								File test_file = new File(file_folder + id + ".json");
+								if (test_file.exists())
+								{
+									/*
+										Checkt ob die tmp_id im
+										file_folder exsistiert.
+									*/
+									test_file = new File(file_folder + tmp_id + ".json");
+
+									/*
+										Zaehlt solange hoch bis
+										eine passende id gefunden wurde.
+									*/
+									while (test_file.exists())
+									{
+										tmp_id = tmp_id + 1;
+										test_file = new File(file_folder + tmp_id + ".json");
+									}
+
+									// update tmp_id mit id
+									id = tmp_id;
+									// System.out.print("New id: --> " + id + "\r");
+								}
 
 								// output file mit id als namen im file_folder
 								PrintWriter output_file = new PrintWriter(file_folder + id + ".json", "UTF-8");
@@ -600,8 +585,6 @@ public class PstMailJSON
 								// schriebt alle Mail infos in output_file
 								output_file.println(root_json);
 								output_file.close();
-
-								start_id = start_id + 1;
 							}
 			        	}
 			        }
@@ -611,17 +594,12 @@ public class PstMailJSON
 			            e.printStackTrace();
 			        }
 				}
-            }
+           }
             finally
             {
                 if (file != null)
                 {
                     file.close();
-
-					PrintWriter output_id = new PrintWriter(new FileWriter(id_file, false));
-					output_id.print(start_id);
-					output_id.flush();
-					output_id.close();
                 }
             }
         }

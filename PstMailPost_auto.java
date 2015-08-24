@@ -19,7 +19,7 @@ import com.independentsoft.pst.Contact;
 import com.independentsoft.pst.Recipient;
 import com.independentsoft.pst.Task;
 
-public class PstMailPost extends PstMailJSON
+public class PstMailPost_auto extends PstMailJSON_auto
 {
 	private static void elasticsearch(String url, String data, String charset)
 	{
@@ -69,16 +69,6 @@ public class PstMailPost extends PstMailJSON
 
 		String url = "http://debian.local:9200/hacking-team/mail";
 
-		long start_id = 1;
-
-		File id_file = new File("id.txt");
-
-		if (id_file.exists())
-		{
-			start_id = get_start_id(id_file);
-			System.out.println("Start id: " + start_id);
-		}
-
         try
         {
             PstFile file = new PstFile(file_name);
@@ -112,13 +102,36 @@ public class PstMailPost extends PstMailJSON
 			                for (int i = 0; i < items.size(); i++)
 			                {
 								// id der Mail (Item)
-								long id = start_id;
+								long id = items.get(i).getId();
 
 								/*
 									Checkt ob die json datei schon im
 									file_folder exsistiert und generiet
 									ggf. eine neue.
 								*/
+								File test_file = new File(file_folder + id + ".json");
+								if (test_file.exists())
+								{
+									/*
+										Checkt ob die tmp_id im
+										file_folder exsistiert.
+									*/
+									test_file = new File(file_folder + tmp_id + ".json");
+
+									/*
+										Zaehlt solange hoch bis
+										eine passende id gefunden wurde.
+									*/
+									while (test_file.exists())
+									{
+										tmp_id = tmp_id + 1;
+										test_file = new File(file_folder + tmp_id + ".json");
+									}
+
+									// update tmp_id mit id
+									id = tmp_id;
+									// System.out.print("New id: --> " + id + "\r");
+								}
 
 								// output file mit id als namen im file_folder
 								PrintWriter output_file = new PrintWriter(file_folder + id + ".json", "UTF-8");
@@ -177,8 +190,6 @@ public class PstMailPost extends PstMailJSON
 								output_file.close();
 
 								elasticsearch(url, root_json.toJSONString(), charset);
-
-								start_id = start_id + 1;
 							}
 			        	}
 			        }
@@ -194,11 +205,6 @@ public class PstMailPost extends PstMailJSON
                 if (file != null)
                 {
                     file.close();
-					
-					PrintWriter output_id = new PrintWriter(new FileWriter(id_file, false));
-					output_id.print(start_id);
-					output_id.flush();
-					output_id.close();
                 }
             }
         }
