@@ -25,6 +25,9 @@ javac-auto:
 	javac -cp jpst-1.0.jar:json-simple-1.1.1.jar PstMailJSON_auto.java
 	javac -cp .:jpst-1.0.jar:json-simple-1.1.1.jar PstMailPost_auto.java
 
+curl-delete:
+	curl -XDELETE http://debian.local:9200/hacking-team/mail/
+
 all:
 	find /home/patrick/Hacking-Team/mail -name "*.pst" -exec echo {} \; -exec java -Xmx12g -cp .:jpst-1.0.jar:json-simple-1.1.1.jar PstMailPost {} \;
 
