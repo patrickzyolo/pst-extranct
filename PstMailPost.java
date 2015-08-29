@@ -132,6 +132,15 @@ public class PstMailPost extends PstMailJSON
 								root_json.put("Plain_body", items.get(i).getBody());
 								root_json.put("Html_body", items.get(i).getBodyHtmlText());
 
+								// JSONObject source = new JSONObject();
+								//
+								// source.put("folder", inbox.getDisplayName());
+								// source.put("pst", file_name);
+								//
+								// root_json.put("source", source);
+
+								root_json.put("source", inbox.getDisplayName());
+
 								/*
 									Task get_task
 									Datum wird als String uebergeben
@@ -194,7 +203,7 @@ public class PstMailPost extends PstMailJSON
                 if (file != null)
                 {
                     file.close();
-					
+
 					PrintWriter output_id = new PrintWriter(new FileWriter(id_file, false));
 					output_id.print(start_id);
 					output_id.flush();

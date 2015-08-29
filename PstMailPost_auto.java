@@ -145,6 +145,15 @@ public class PstMailPost_auto extends PstMailJSON_auto
 								root_json.put("Plain_body", items.get(i).getBody());
 								root_json.put("Html_body", items.get(i).getBodyHtmlText());
 
+								// JSONObject source = new JSONObject();
+								//
+								// source.put("folder", inbox.getDisplayName());
+								// source.put("pst", file_name);
+								//
+								// root_json.put("source", source);
+								
+								root_json.put("source", inbox.getDisplayName());
+
 								/*
 									Task get_task
 									Datum wird als String uebergeben
