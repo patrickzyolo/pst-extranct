@@ -1,4 +1,5 @@
 new:
+	rm -f id.txt
 	rm -f "PstMailJSON.class"
 	rm -f "PstMailPost.class"
 	rm -rf data
@@ -29,7 +30,8 @@ curl-delete:
 	curl -XDELETE http://debian.local:9200/hacking-team/mail/
 
 all:
-	find /home/patrick/Hacking-Team/mail -name "*.pst" -exec echo {} \; -exec java -Xmx12g -cp .:jpst-1.0.jar:json-simple-1.1.1.jar PstMailPost {} \;
+	cd /home/patrick/Hacked-Team/Hacked-Team;
+	find . -name "*.pst" -exec echo {} \; -exec java -Xmx12g -cp .:jpst-1.0.jar:json-simple-1.1.1.jar PstMailPost {} \;
 
 test:
 	java -Xmx12g -cp .:jpst-1.0.jar:json-simple-1.1.1.jar PstMailPost c.pozzi.pst
