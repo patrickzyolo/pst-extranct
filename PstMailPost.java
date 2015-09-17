@@ -137,7 +137,7 @@ public class PstMailPost extends PstMailJSON
 								source.put("folder", inbox.getDisplayName());
 								source.put("file", file_name);
 
-								root_json.put("source", source);
+								root_json.put("Source", source);
 
 								/*
 									Task get_task

@@ -30,8 +30,7 @@ curl-delete:
 	curl -XDELETE http://debian.local:9200/hacking-team/mail/
 
 all:
-	cd /home/patrick/Hacked-Team/Hacked-Team;
-	find . -name "*.pst" -exec echo {} \; -exec java -Xmx12g -cp .:jpst-1.0.jar:json-simple-1.1.1.jar PstMailPost {} \;
+	find /home/patrick/Hacked-Team/Hacked-Team -name "*.pst" -exec echo {} \; -exec java -Xmx12g -cp .:jpst-1.0.jar:json-simple-1.1.1.jar PstMailPost {} \;
 
 test:
 	java -Xmx12g -cp .:jpst-1.0.jar:json-simple-1.1.1.jar PstMailPost c.pozzi.pst
